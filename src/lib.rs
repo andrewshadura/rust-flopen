@@ -1,9 +1,9 @@
-// Copyright (C) 2021 Andrej Shadura
+// Copyright (C) 2021, 2025 Andrej Shadura
 // SPDX-License-Identifier: MIT
-use nix::fcntl::{flock, FlockArg};
+use nix::errno::Errno;
 use std::fs::{metadata, File, OpenOptions};
 use std::io::Result;
-use std::os::unix::{fs::MetadataExt, io::AsRawFd};
+use std::os::unix::{fs::MetadataExt, io::AsRawFd, io::RawFd};
 use std::path::Path;
 
 /// This trait provides a way to reliably open and lock a file
@@ -54,10 +54,15 @@ pub trait OpenAndLock {
     fn try_open_and_lock<P: AsRef<Path>>(&self, path: P) -> Result<File>;
 }
 
+fn flock(fd: RawFd, operation: libc::c_int) -> nix::Result<()> {
+    let res = unsafe { libc::flock(fd, operation) };
+    Errno::result(res).map(drop)
+}
+
 fn open_and_lock<P: AsRef<Path>>(
     options: &OpenOptions,
     path: P,
-    lock_mode: FlockArg,
+    lock_mode: libc::c_int,
 ) -> Result<File> {
     loop {
         let file = options.open(&path)?;
@@ -78,11 +83,11 @@ fn open_and_lock<P: AsRef<Path>>(
 
 impl OpenAndLock for OpenOptions {
     fn open_and_lock<P: AsRef<Path>>(&self, path: P) -> Result<File> {
-        open_and_lock(self, path, FlockArg::LockExclusive)
+        open_and_lock(self, path, libc::LOCK_EX)
     }
 
     fn try_open_and_lock<P: AsRef<Path>>(&self, path: P) -> Result<File> {
-        open_and_lock(self, path, FlockArg::LockExclusiveNonblock)
+        open_and_lock(self, path, libc::LOCK_EX | libc::LOCK_NB)
     }
 }
 
