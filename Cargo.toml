@@ -3,6 +3,7 @@ name = "flopen"
 version = "0.1.2"
 authors = ["Andrej Shadura <andrew.shadura@collabora.co.uk>"]
 description = "Reliably open and lock a file"
+documentation = "https://docs.rs/flopen"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/andrewshadura/rust-flopen"
