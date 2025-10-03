@@ -64,8 +64,8 @@ fn open_and_lock<P: AsRef<Path>>(
         flock(file.as_raw_fd(), lock_mode)?;
         if let Ok(metadata_at_path) = metadata(&path) {
             let file_metadata = file.metadata()?;
-            if metadata_at_path.dev() != file_metadata.dev() ||
-               metadata_at_path.ino() != file_metadata.ino()
+            if metadata_at_path.dev() != file_metadata.dev()
+                || metadata_at_path.ino() != file_metadata.ino()
             {
                 continue;
             }
