@@ -1,6 +1,6 @@
 [package]
 name = "flopen"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Andrej Shadura <andrew.shadura@collabora.co.uk>"]
 description = "Reliably open and lock a file"
 documentation = "https://docs.rs/flopen"
